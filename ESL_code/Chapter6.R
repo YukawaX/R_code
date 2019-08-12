@@ -28,5 +28,22 @@ Local_LDA<-function(x,Train_y,Train_x,classes=10){#class_label = 0,1,2,...,
     mu = c(mu,mu_i)
     Sigma = Sigma + 
   }
-  
 }
+
+######
+phoneme<-ElemStatLearn::phoneme
+library(splines)
+Train<-phoneme[grep("train",phoneme$speaker),-258]
+Test<-phoneme[grep("test",phoneme$speaker),-2578]
+aa_Train<-Train[Train$g=="aa",]
+ao_Train<-Train[Train$g=="ao",]
+aa_Test<-Test[Test$g=="aa",]
+ao_Test<-Test[Test$g=="ao",]
+Train_set<-rbind(aa_Train,ao_Train)
+Test_set<-rbind(aa_Test,ao_Test)
+
+Nums<-c(2,4,8,16,32,64,128,256)##Number of basis functions
+
+
+
+
