@@ -40,27 +40,22 @@ result=table(Test_set$response,predicted_y)
 
 ##backfitting for linear models
 ##data generation
-n=200
-x1=rnorm(n,1,1)
-x2=rnorm(n,2,1)
-# x3=rnorm(n,3,1)
-# x4=rnorm(n,4,1)
-# x5=rnorm(n,5,1)
-y = 1+3*x1+x2+rnorm(n)+1.3*x3#+x4+0.5*x5+rnorm(n)
-x=cbind(x1,x2,x3) 
+dat=prostate[,c("lcavol","lweight","svi","lpsa")]
+x=dat[,c("lcavol","lweight","svi")]
+y=dat[,"lpsa"]
 x_means=colMeans(x)
 x_centered = t(t(x)-x_means)
 y_centered = y-mean(y)
 beta=0*(1:3)
 gamma=0*(1:3)
-tol = 10e-6
+tol = 10e-8
 iter=0
 while(TRUE){
   iter = iter +1
   print(iter)
 for(j in 1:3){
   y_j = y_centered -x_centered[,-j]%*%beta[-j]
-  gamma[j]=sum(x_centered[,j]*y_j)/(sum((x_centered)^2))
+  gamma[j]=lm(y_j~x_centered[,j])$coefficients[2]#sum(x_centered[,j]*y_j)/(sum((x_centered)^2))
 }
   if(max(abs(beta-gamma))<tol){
     break
@@ -69,3 +64,18 @@ for(j in 1:3){
     beta = gamma
   }
 }
+intercept<-mean(y)-mean(as.matrix(x)%*%gamma)
+
+###Local Scoring Algorithm for the Additive Logistic Regression Model
+
+##CART
+library(rpart)
+library(maptree)
+library(rpart.plot)
+ClassifiTree_model<-rpart(spam~.,data=spam,parms = list(split="information"))
+draw.tree(ClassifiTree_model)
+rpart.plot(ClassifiTree_model)
+printcp(ClassifiTree_model)
+plotcp(ClassifiTree_model)
+
+
